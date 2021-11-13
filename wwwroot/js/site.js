@@ -3,7 +3,7 @@
 
 // Write your JavaScript code.
 const connection = new signalR.HubConnectionBuilder()
-    .withUrl("https://localhost:5001/ServerHub")
+    .withUrl("https://localhost:5001/ServerHub", { accessTokenFactory: () => "token" })
     .configureLogging(signalR.LogLevel.Information)
     .build();
 

@@ -1,12 +1,18 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace SignalR_Tests
@@ -23,6 +29,8 @@ namespace SignalR_Tests
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddKeycloakAuth(Configuration);
+
             services.AddCors(policy =>
             {
                 policy.AddPolicy("_myAllowSpecificOrigins", builder =>
@@ -57,13 +65,17 @@ namespace SignalR_Tests
             app.UseStaticFiles();
 
             app.UseRouting();
-
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapRazorPages();
-                endpoints.MapHub<ServerHub>("/ServerHub");
+                endpoints.MapHub<ServerHub>("/ServerHub", options =>
+                {
+                    options.Transports =
+                        HttpTransportType.WebSockets ;
+                });
             });
         }
     }
